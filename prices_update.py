@@ -3,15 +3,24 @@ import xlrd
 
 
 def GetPriceBySKU(file, sku):
-	p_book = xlrd.open_workbook(file, formatting_info=True)
+	
+	print(sku)
+	
+	p_book = xlrd.open_workbook(file)
+	
 	sheet1 = p_book.sheet_by_index(1)
 	sheet2 = p_book.sheet_by_index(2)
-	for row in sheet1:
+
+	for rownum in range(sheet1.nrows):
+		row = sheet1.row_values(rownum)
 		if sku in row[0]:
+			print(row)
 			return row[3]
 
-	for row in sheet2:
+	for rownum in range(sheet2.nrows):
+		row = sheet2.row_values(rownum)
 		if sku in row[0]:
+			print(row)
 			return row[3]
 	return null
 
@@ -26,7 +35,9 @@ def main():
 	reader = csv.DictReader(c_file)
 
 	nc_file = open(new_catalog_file, "w")
-	
+
+	print(GetPriceBySKU(prices_file, "320/04208"))
+
 
 if __name__ == "__main__":
 	main()
