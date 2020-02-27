@@ -1,9 +1,9 @@
 import csv
 import xlrd
 
+found_counter = 0
 
 def GetPriceBySKU(file, sku):
-	
 	print(sku)
 	
 	p_book = xlrd.open_workbook(file)
@@ -14,29 +14,57 @@ def GetPriceBySKU(file, sku):
 	for rownum in range(sheet1.nrows):
 		row = sheet1.row_values(rownum)
 		if sku in row[0]:
-			print(row)
 			return row[3]
 
 	for rownum in range(sheet2.nrows):
 		row = sheet2.row_values(rownum)
 		if sku in row[0]:
-			print(row)
 			return row[3]
-	return null
+
+	global found_counter
+	found_counter+=1
+	return None
 
 
 def main():
+	
+	global found_counter
+	
 	catalog_file = "jcbeuro_ru.csv"
 	new_catalog_file = "jcbeuro_ru_new.csv"
-
+	log_file_path = "log.txt"
 	prices_file = "sorted_prices.xlsx"
 
 	c_file = open(catalog_file, "r")
-	reader = csv.DictReader(c_file)
-
+	c_reader = csv.DictReader(c_file)
 	nc_file = open(new_catalog_file, "w")
+	log_file = open(log_file_path, "w")
+	c_writer = csv.DictWriter(nc_file, c_reader.fieldnames)
 
-	print(GetPriceBySKU(prices_file, "320/04208"))
+	c_writer.writeheader()
+
+	for line in c_reader:
+		if line["SKU"]:
+			log_file.write("----------------------------------\n")
+			log_file.write("Артикул: " + line["SKU"] + "\n")
+			log_file.write("Новая цена: ")
+
+			newline = line["SKU"].split(",")
+			newprice = GetPriceBySKU(prices_file, newline[0])
+			
+			if newprice:
+				line["Price"] = newprice
+				log_file.write(str(newprice)+"\n")
+			else:
+				log_file.write("Not found\n")
+
+			log_file.write("\n")
+
+		c_writer.writerow(line)
+		
+	log_file.write("\n")
+	log_file.write("======================================\n")
+	log_file.write("Не найдено: " + str(found_counter))
 
 
 if __name__ == "__main__":
