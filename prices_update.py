@@ -3,6 +3,22 @@ import xlrd
 
 found_counter = 0
 
+
+def GetListOfSKUFromPriceList(SKUStr):
+	SKUList = []
+	if "," in SKUStr:
+		SKUList.extend(SKUStr.split(","))
+		for i in range(len(SKUList)):
+			SKUList[i] = SKUList[i].replace(" ", "")
+	elif " " in SKUStr:
+		SKUList.extend(SKUStr.split(" "))
+	else:
+		SKUList.append(SKUStr)
+
+	SKUList = [x for x in SKUList if x]
+	return SKUList
+
+
 def GetPriceBySKU(file, sku):
 	print(sku)
 	
@@ -13,13 +29,15 @@ def GetPriceBySKU(file, sku):
 
 	for rownum in range(sheet1.nrows):
 		row = sheet1.row_values(rownum)
-		if sku in row[0]:
-			return row[3]
+		for i in GetListOfSKUFromPriceList(row[0]):
+			if sku == i:
+				return row[3]
 
 	for rownum in range(sheet2.nrows):
 		row = sheet2.row_values(rownum)
-		if sku in row[0]:
-			return row[3]
+		for i in GetListOfSKUFromPriceList(row[0]):
+			if sku == i:
+				return row[3]
 
 	global found_counter
 	found_counter+=1
@@ -67,5 +85,10 @@ def main():
 	log_file.write("Не найдено: " + str(found_counter))
 
 
+def test():
+	print(GetListOfSKUFromPriceList("12312   3456"))
+
+
 if __name__ == "__main__":
 	main()
+	#test()
