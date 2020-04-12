@@ -31,13 +31,15 @@ def GetPriceBySKU(file, sku):
 		row = sheet1.row_values(rownum)
 		for i in GetListOfSKUFromPriceList(row[0]):
 			if sku == i:
-				return row[3]
+				if row[3]:
+					return row[3]
 
 	for rownum in range(sheet2.nrows):
 		row = sheet2.row_values(rownum)
 		for i in GetListOfSKUFromPriceList(row[0]):
 			if sku == i:
-				return row[3]
+				if row[3]:
+					return row[3]
 
 	global found_counter
 	found_counter+=1
@@ -48,10 +50,10 @@ def main():
 	
 	global found_counter
 	
-	catalog_file = "jcbeuro_ru.csv"
-	new_catalog_file = "jcbeuro_ru_new.csv"
+	catalog_file = sys.argv[1]
+	new_catalog_file = "new_catalog.csv"
 	log_file_path = "log.txt"
-	prices_file = "sorted_prices.xlsx"
+	prices_file = sys.argv[2]
 
 	c_file = open(catalog_file, "r")
 	c_reader = csv.DictReader(c_file)
